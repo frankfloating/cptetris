@@ -283,3 +283,19 @@ let color_choice(t : t_color t_array) : t_color =
   t.value.(pos)
 ;;
 
+let cur_shape_choice(shapes, mat_szx, mat_szy, color_arr : t_shape t_array * int * int * t_color t_array) : t_cur_shape =
+  let shape_rand : int ref = ref(rand_int(0, (arr_len(shapes.value) - 1))) in
+  let x_rand : int = rand_int(0, 100) in
+  let color_rand : t_color ref = ref(color_choice(color_arr)) in
+  {base = ref({x = x_rand ; y = mat_szy}) ; shape = shape_rand ; color = color_rand}
+;;
+
+
+let rec insert(cur, shape, param, mymat : t_cur_shape * t_point list * t_param * t_color matrix) : bool =
+  let y_line : t_color list = mymat.(!(cur.base.y)) in
+  if isempty(y_line)
+  then true
+  else
+    if fst(y_line) <> white
+    then false
+           else insert(
