@@ -277,6 +277,23 @@ let move(pl, dir : t_play * char) : bool =
   )
 ;;
 
+let valid_matrix_point(p, param : t_point * t_param) : bool =
+  if  p.x<0 || p.y<0 || p.x>param.mat_szx || p.y>param.mat_szy
+  then false
+  else true
+;;
+
+let is_free_move(p, shape, mymat, param : t_point * t_point list * t_color matrix * t_param) : bool =
+  let temp = ref true in
+  for i = 0 to ((len(shape))-1) do
+    if valid_matrix_point((x= p.x + (nth(shape,i)).x;
+                           y= p.y + (nth(shape, i)).y), param)
+       && mymat.(p.x + (nth(shape, i)).x).(p.y + (nth(shape, i)).y)= grey
+    then temp := !temp
+    else temp := false
+  done;
+  !temp
+;;
 
 (* ----------------------------------- *)
 (* ----------------------------------- *)
