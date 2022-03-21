@@ -27,8 +27,8 @@ type t_point = {x : int ; y : int} ;;
 let draw_absolute_pt(p, base_draw, dilat, col : t_point * t_point * int * t_color) : unit =
   let (p_dilat_x, p_dilat_y) : int * int = ((p.x * dilat) + base_draw.x, (p.y * dilat) + base_draw.y) in
   (
+  set_color(col) ;
   draw_rect(p_dilat_x, p_dilat_y, dilat - 1, dilat - 1) ;
-  set_color(col)
   )
 ;;
 
@@ -36,15 +36,14 @@ let draw_absolute_pt(p, base_draw, dilat, col : t_point * t_point * int * t_colo
 let fill_absolute_pt(p, base_draw, dilat, col : t_point * t_point * int * t_color) : unit =
   let (p_dilat_x, p_dilat_y) : int * int = ((p.x * dilat) + base_draw.x, (p.y * dilat) + base_draw.y) in
   (
-  fill_rect(p_dilat_x, p_dilat_y, dilat - 1, dilat - 1) ;
-  set_color(col)
+  set_color(col) ;
+  fill_rect(p_dilat_x + 1, p_dilat_y + 1, dilat - 3, dilat - 3) ;
   )
 ;;
 
 let drawfill_absolute_pt(p,  base_draw, dilat, col : t_point * t_point * int * t_color) : unit =
-  let col_draw : t_color = black in
   (
-  draw_absolute_pt(p, base_draw, dilat, col_draw) ;
+  draw_absolute_pt(p, base_draw, dilat, black) ;
   fill_absolute_pt(p, base_draw, dilat, col)
   )
 ;;
@@ -57,13 +56,13 @@ let draw_relative_pt(p, base_point, base_draw, dilat, col : t_point * t_point * 
 
 
 let fill_relative_pt(p, base_point, base_draw, dilat, col : t_point * t_point * t_point * int * t_color) : unit =
-  let (p_newx, p_newy) : int * int = (p.x + base_point.x, p.y + base_point.x) in
+  let (p_newx, p_newy) : int * int = (p.x + base_point.x, p.y + base_point.y) in
   fill_absolute_pt({x = p_newx ; y = p_newy}, base_draw, dilat, col) 
 ;;
 
 
 let drawfill_relative_pt(p, base_point, base_draw, dilat, col : t_point * t_point * t_point * int * t_color) : unit =
-  let (p_newx, p_newy) : int * int = (p.x + base_point.x, p.y + base_point.x) in
+  let (p_newx, p_newy) : int * int = (p.x + base_point.x, p.y + base_point.y) in
   drawfill_absolute_pt({x = p_newx ; y = p_newy}, base_draw, dilat , col)
 ;;
 
@@ -90,9 +89,8 @@ let rec fill_pt_list(l, base_pt, base_draw, dilat, col : t_point list * t_point 
 ;;
 
 let drawfill_pt_list(l, base_pt, base_draw, dilat, col : t_point list * t_point * t_point * int * t_color) : unit =
-  let col_draw : t_color = black in
   (
-  draw_pt_list(l, base_pt, base_draw, dilat, col_draw) ;
+  draw_pt_list(l, base_pt, base_draw, dilat, black) ;
   fill_pt_list(l, base_pt, base_draw, dilat, col)
   )
 ;;
@@ -100,29 +98,29 @@ let drawfill_pt_list(l, base_pt, base_draw, dilat, col : t_point list * t_point 
                            
 let draw_frame(base_draw, size_x, size_y, dilat : t_point * int * int * int) : unit =
   (
-    for i =  base_draw.x downto (base_draw.x - 3)
+    for i =  -1 downto  -2
     do
-      for a = base_draw.y - 3 to (base_draw.y + size_y)
+      for a = -2 to size_y
       do
-        drawfill_absolute_pt({x = 0 ; y = 0}, {x = i ; y = a}, dilat, black)
+        drawfill_absolute_pt({x = i ; y = a}, {x = base_draw.x ; y = base_draw.y}, dilat, black)
       done
     done
   ) ;
   (
-    for a = base_draw.y downto (base_draw.y - 3)
+    for a = -1 downto -2
     do
-      for i = base_draw.x - 3 to (base_draw.x + size_x)
+      for i = -2 to size_x
       do
-        drawfill_absolute_pt({x = 0 ; y = 0}, {x = i ; y = a}, dilat, black)
+        drawfill_absolute_pt({x = i ; y = a}, {x = base_draw.x ; y = base_draw.y}, dilat, black)
       done
     done
   ) ;
   (
-    for i = (base_draw.x + size_x + 3) downto (base_draw.x + size_x)
+    for i = size_x + 2 downto size_x + 1
     do
-      for a = base_draw.y - 3 to (base_draw.y + size_y)
+      for a = -2 to size_y
       do
-        drawfill_absolute_pt({x = 0 ; y = 0}, {x = i ; y = a}, dilat, black)
+        drawfill_absolute_pt({x = i ; y = a}, {x = base_draw.x ; y = base_draw.y}, dilat, black)
       done
     done
   )
@@ -205,18 +203,23 @@ let init_param() : t_param =
 ;;
 
 
-let time_change(ini, ext, rat : float * float * float) : t_param_time =
-  {init = ini ; extent = ext ; ratio = rat}
+let time_get(p : t_param) : t_param_time =
+  p.time
 ;;
 
 
-let graphic_change(b, d, col : t_point * int * t_color t_array) : t_param_graphics =
-  {base = b ; dilat = d ; color_arr = col}
+let mat_get(p : t_param) : (int * int) =
+  (p.mat_szx, p.mat_szy)
 ;;
 
 
-let param_change(t, mszx, mszy, gra, sha : t_param_time * int * int * t_param_graphics * t_shape t_array) : t_param =
-  {time = t ; mat_szx = mszx ; mat_szy = mszy ; graphics = gra ; shapes = sha}
+let graphic_get(p : t_param) : t_param_graphics =
+  p.graphics
+;;
+
+
+let shape_get(p :t_param) : t_shape t_array =
+  p.shapes
 ;;
 
 
@@ -233,10 +236,10 @@ let color_choice(t : t_color t_array) : t_color =
 
 let cur_shape_choice(shapes, mat_szx, mat_szy, color_arr : t_shape t_array * int * int * t_color t_array) : t_cur_shape =
   let shape_rand : int ref = ref(rand_int(0, shapes.len - 1)) in
-  let x_rand : int = rand_int(0, (mat_szx - shapes.value.(!(shape_rand)).x_len)) in
-  let y_pos : int = (mat_szy - shapes.value.(!(shape_rand)).y_len) in
+  let x_pos_max : int = mat_szx - shapes.value.(!(shape_rand)).x_len in
+  let x_rand : int = rand_int(0, x_pos_max) in
   let color_rand : t_color ref = ref(color_choice(color_arr)) in
-  {base = ref({x = x_rand ; y = y_pos}) ; shape = shape_rand ; color = color_rand}
+  {base = ref({x = x_rand ; y = mat_szy}) ; shape = shape_rand ; color = color_rand}
 ;;
 
 
@@ -351,5 +354,4 @@ let init_play() : t_play =
   {par = param ; cur_shape = cur ; mat = mymat}
   )
 ;;
-
 
