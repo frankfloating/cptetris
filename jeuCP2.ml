@@ -15,6 +15,23 @@ let mywait(x : float) : unit =
 ;;
 
 
+let valid_matrix_point(p, param : t_point * t_param) : bool =
+  (
+    (p.x >= 0) && (p.y >= 0) && (p.x <= param.mat_szx) && (p.y <= param.mat_szy)
+  )
+;;
+
+
+let rec is_free_move(p, shape, mymat, param : t_point * t_point list * t_color matrix * t_param) : bool =
+  if isempty(shape)
+  then true
+  else
+    if (mymat.(p.x).(p.y) <> white) || (mymat.((fst(shape)).x).((fst(shape)).y) <> white)
+    then false
+    else is_free_move(p, rem_fst(shape), mymat, param)
+;;
+
+  
 (* --------------------------------- *)
 (* --------------------------------- *)
 (*   Types et fonctions graphique    *)
@@ -127,7 +144,69 @@ let draw_frame(base_draw, size_x, size_y, dilat : t_point * int * int * int) : u
 ;;
 
 
+let move_left(pl : t_play) : unit =
+  let p : t_point = {x = !(pl.cur_shape.base).x - 1 ; y = !(pl.cur_shape.base).y} in
+  let shape : t_point list = pl.par.shapes.value.(!(pl.cur_shape.shape)).shape in
+  let shape_xlen : int = pl.par.shapes.value.(!(pl.cur_shape.shape)).x_len in
+  let new_shape_list : t_point list = [] in
+  for a = 0 to shape_xlen - 1
+  do
+    add_fst(new_shape_list, {x = (fst(shape)).x - 1 ; y = (fst(shape)).y})
+  done ;
+  if is_free_move(p, new_shape_list, pl.mat, pl.par)
+  then drawfill_pt_list(new_shape_list, p, pl.par.graphics.base, pl.par.graphics.dilat, !(pl.cur_shape.color))
+  else ()
+;;
 
+
+let move_right(pl : t_play) : unit =
+  let p : t_point = {x = !(pl.cur_shape.base).x + 1 ; y = !(pl.cur_shape.base).y} in
+  let shape : t_point list = pl.par.shapes.value.(!(pl.cur_shape.shape)).shape in
+  let shape_xlen : int = pl.par.shapes.value.(!(pl.cur_shape.shape)).x_len in
+  let new_shape_list : t_point list = [] in
+  for a = 0 to shape_xlen - 1
+  do
+    add_fst(new_shape_list, {x = (fst(shape)).x + 1 ; y = (fst(shape)).y})
+  done ;
+  if is_free_move(p, new_shape_list, pl.mat, pl.par)
+  then drawfill_pt_list(new_shape_list, p, pl.par.graphics.base, pl.par.graphics.dilat, !(pl.cur_shape.color))
+  else ()
+;;
+
+
+let move_down(pl : t_play) : unit =
+  let p : t_point = {x = !(pl.cur_shape.base).x ; y = !(pl.cur_shape.base).y - 1} in
+  let shape : t_point list = pl.par.shapes.value.(!(pl.cur_shape.shape)).shape in
+  let shape_ylen : int = pl.par.shapes.value.(!(pl.cur_shape.shape)).y_len in
+  let new_shape_list : t_point list = [] in
+  for a = 0 to shape_ylen - 1
+  do
+    add_fst(new_shape_list, {x = (fst(shape)).x ; y = (fst(shape)).y - 1})
+  done ;
+  if is_free_move(p, new_shape_list, pl.mat, pl.par)
+  then (
+    clear_graph() ;
+    draw_frame(pl.par.graphics.base, pl.par.mat_szx, pl.par.mat_szy, black) ;
+    drawfill_pt_list(new_shape_list, p, pl.par.graphics.base, pl.par.graphics.dilat, !(pl.cur_shape.color))
+  )
+  else ()
+;;
+
+
+let rotate_right(pl : t_play) : unit =
+  let p : t_point = {x = !(pl.cur_shape.base).x ; y = !(pl.cur_shape.base).y} in
+  let shape : t_point list = pl.par.shapes.value.(!(pl.cur_shape.shape)).shape in
+   let shape_xlen : int = pl.par.shapes.value.(!(pl.cur_shape.shape)).y_len in
+  let shape_ylen : int = pl.par.shapes.value.(!(pl.cur_shape.shape)).x_len in
+  let new_shape_list : t_point list = [] in
+  for a = 0 to shape_ylen - 1
+  do
+    add_fst(new_shape_list, {x = (fst(shape)).x ; y = (fst(shape)).y})
+  done ;
+  if is_free_move(p, new_shape_list, pl.mat, pl.par)
+  then drawfill_pt_list(new_shape_list, p, pl.par.graphics.base, pl.par.graphics.dilat, !(pl.cur_shape.color))
+  else ()
+;;
 (* ------------------------------------------------- *)
 (* ------------------------------------------------- *)
 (*    Types, formes, parametrage et initialisation   *)
@@ -244,13 +323,15 @@ let cur_shape_choice(shapes, mat_szx, mat_szy, color_arr : t_shape t_array * int
 
 
 let rec insert(cur, shape, param, mymat : t_cur_shape * t_point list * t_param * t_color matrix) : bool =
+  let (shape_in_spacex, shape_in_spacey) : (int * int) = ((fst(shape)).x + !(cur.base).x, (fst(shape)).y + !(cur.base).y) in
   if isempty(shape)
   then true
   else
-    if (mymat.((fst(shape)).x).((fst(shape)).y) <> white) && (mymat.(!(cur.base).x).(!(cur.base).y) <> white)
+    if mymat.(shape_in_spacex).(shape_in_spacey) = white
     then insert(cur, rem_fst(shape), param, mymat)
     else false
 ;;
+
 
 (* ----------------------------------------------- *)
 (* ----------------------------------------------- *)
@@ -355,3 +436,5 @@ let init_play() : t_play =
   )
 ;;
 
+init_play() ;;
+close_graph() ;;
