@@ -1,3 +1,5 @@
+#use "topfind" ;;
+#require "graphics" ;;
 
 (*
   When you launch the ocaml command: ocaml -init CPinter.ml
