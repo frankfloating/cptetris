@@ -269,10 +269,8 @@ let test_structurel_insert_1(status : t_test_status) : unit =
   let test_step : t_test_step = test_start(status, "test_structurel_insert_1") in
   let cur : t_cur_shape = cur_shape_choice(init_shapes(), 15, 28, init_color()) and shape : t_point list = (init_sh011()).shape in
   let param : t_param = init_param() and mymat : t_color matrix = mat_make(15, 28, white) in
-  open_graph(100, 100) ;
   let test_result : bool t_test_result = test_exec(test_step, insert, (cur, shape, param, mymat)) in
   assert_true(test_step, "dans la boucle et premier consequence", test_is_success(test_result)) ;
-  close_graph() ;
   test_end(test_step)
 ;;
 (*on verifie que nous rentrons dans les deux conséquences et la première alternance de la fonction, donc dans la boucle récursive*)
@@ -465,8 +463,9 @@ pourquoi ce test : test fait appel à fill_pt_list() et drawfill_pt_list().
 let test_structurel_move_down_1(status : t_test_status) : unit =
   let test_step : t_test_step = test_start(status, "test_structurel_move_down_1") in
   let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
-  test_exec(test_step, move_down, pl) ;
+  let test_result : bool t_test_result = test_exec(test_step, move_down, pl) in
   assert_equals(test_step, "forme descend", !(pl.cur_shape.base), {x = 5 ; y = 9}) ;
+  assert_true(test_step, "bool true", test_get(test_result)) ;
   test_end(test_step)
 ;;
 (*pourquoi ce test : rentre dans alternance*)
@@ -477,8 +476,9 @@ let test_structurel_move_down_1(status : t_test_status) : unit =
 let test_structurel_move_down_2(status : t_test_status) : unit =
   let test_step : t_test_step = test_start(status, "test_structurel_move_down_2") in
   let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 0}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
-  test_exec(test_step, move_down, pl) ;
+  let test_result : bool t_test_result = test_exec(test_step, move_down, pl) in
   assert_equals(test_step, "forme ne bouge pas", !(pl.cur_shape.base), {x = 5 ; y = 0}) ;
+  assert_false(test_step, "bool false", test_get(test_result)) ;
   test_end(test_step)
 ;;
 (*pourquoi ce test : rentre dans conséquence*)
@@ -573,25 +573,20 @@ avec : open_graph(900, 900) ;;
 résultat attendu : forme bleu atteint le bas de l'espace de travail.
 résultat obtenu : comme attendu.
 test ok ;
-pourquoi ce test : vérifier la condition !(p).y > 0 respecté.
+pourquoi ce test : vérifier que la forme repose sur bas de l'espace d'affichage
  *)
 
 
-(*test_strucurel_move_at_bottom_1*)
+(*test_strucurel_move_at_bottom*)
 
-let test_structurel_move_at_bottom_1(status : t_test_status) : unit =
-  let test_step : t_test_step = test_start(status, "test_structurel_move_at_bottom_1") in
+let test_structurel_move_at_bottom(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_move_at_bottom") in
   let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
   test_exec(test_step, move_at_bottom, pl);
-  for a = 5 to 8
-  do
-    if pl.mat.(a).(0) <> blue
-    then test_error(test_step)
-    else assert_equals(test_step, "forme atteint bas de l'espace de travail", pl.mat.(a).(0), blue)
-    done ;
-    test_end(test_step)
+  assert_equals(test_step, "forme en bas de l'espace de travail", !(pl.cur_shape.base), {x = 5 ; y = 0}) ; 
+  test_end(test_step)
 ;;
-(*pourquoi ce test : vérifier que la matrix contient la forme immobile au bas de l'espace de travail*)
+(*pourquoi ce test : condition d'arrêt provient de move_down, on rentre dans la boucle malgré les coordonnés du point base de forme*)
 
 
 (*test_graphique_move_at_bottom_2*)
@@ -604,31 +599,8 @@ avec : open_graph(900, 900) ;;
 résultat attendu : forme bleu atteint s'arrête à la position {x = 5 ; y = 6}.
 résultat obtenu : comme attendu.
 test ok ;
-pourquoi ce test : vérifier la condition is_free_move = true respecté.
+pourquoi ce test : vérifier que la forme repose sur une autre
  *)
-
-
-(*test_strucurel_move_at_bottom_1*)
-
-let test_structurel_move_at_bottom_2(status : t_test_status) : unit =
-  let test_step : t_test_step = test_start(status, "test_structurel_move_at_bottom_2") in
-  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
-  (
-  pl.cur_shape.base :=  {x = 5 ; y = 10} ;
-  pl.cur_shape.shape := 0 ;
-  pl.cur_shape.color := blue ;
-  pl.mat.(5).(5) <- yellow ;
-  ) ;
-  test_exec(test_step, move_at_bottom, pl) ;
-  for a = 5 to 8
-  do
-    if pl.mat.(a).(6) <> blue
-    then test_error(test_step)
-    else assert_equals(test_step, "forme atteint haut d'une autre forme", pl.mat.(a).(6), blue)
-  done ;
-  test_end(test_step)
-;;
-(*pourquoi ce test : vérifier que la matrix contient la forme immobile sur une autre*)    
 
 
 (*test_structurel_is_column_full_1*)
@@ -701,7 +673,24 @@ let test_structurel_decal_2(status : t_test_status) : unit =
 ;;
 (*pourquoi ce test : on test la fonction en ne rentrant pas dans les deux boucles*)
                                                    
+(*test_graphique_clear_play_1*)
 
+(*
+test pour pl : {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} ;
+avec : open_graph(900, 900) ;;
+       draw_frame({x = 50 ; y = 50}, 15, 28, 20) ;;
+       for a = 0 to 14
+       do
+        pl.mat.(a).(1) <- blue ;
+        pl.mat.(a).(3) <- blue ;
+       done ;
+résultat attendu : ligne pleine effacé.
+résultat obtenu : comme attendu.
+test ok ;
+pourquoi ce test : vérifier que lignes pleines disparaient et remplacées par ligne du dessus
+ *)
+
+ *)
 (*test_structurel_clear_play_1*)
 
 let test_structurel_clear_play_1(status : t_test_status) : unit =
@@ -720,8 +709,27 @@ let test_structurel_clear_play_1(status : t_test_status) : unit =
   done ;
   test_end(test_step)
 ;;
-(*pourquoi ce test : on test la fonction en rentrant dans la conséquence*)
+(*pourquoi ce test : on test la fonction en rentrant dans la première conséquence*)
 
+
+(*test_graphique_clear_play_2*)
+
+(*
+test pour pl : {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} ;
+avec : open_graph(900, 900) ;;
+       draw_frame({x = 50 ; y = 50}, 15, 28, 20) ;;
+       for a = 0 to 14
+       do
+        pl.mat.(a).(1) <- blue ;
+        pl.mat.(a).(3) <- blue ;
+       done ;
+       pl.mat.(0).(1) <- white ;
+       pl.mat.(0).(3) <- white ;
+résultat attendu : lignes non effacées.
+résultat obtenu : comme attendu.
+test ok ;
+pourquoi ce test : vérifier que lignes non pleines inchangés
+ *)
 
 (*test_structurel_clear_play_2*)
 
@@ -745,7 +753,7 @@ let test_structurel_clear_play_2(status : t_test_status) : unit =
   done ;
   test_end(test_step)
 ;;
-(*pourquoi ce test : on test la fonction en rentrant dans l'altérnance*)
+(*pourquoi ce test : on test la fonction en rentrant dans la première l'altérnance*)
 
 
 (*test_structurel_final_insert*)
@@ -793,6 +801,7 @@ let test_structurel_final_newstep_2(status : t_test_status) : unit =
 
 let test_run() : unit =
   let status : t_test_status = create_test_status() in
+  open_graph(100, 100) ;
   test_structurel_color_choice(status) ;
   test_structurel_cur_shape_choice(status) ;
   test_structurel_insert_1(status) ;
@@ -812,8 +821,7 @@ let test_run() : unit =
   test_structurel_rotate_right_2(status) ;
   test_structurel_rotate_left_1(status) ;
   test_structurel_rotate_left_2(status) ;
-  test_structurel_move_at_bottom_1(status) ;
-  test_structurel_move_at_bottom_2(status) ;
+  test_structurel_move_at_bottom(status) ;
   test_structurel_is_column_full_1(status) ;
   test_structurel_is_column_full_2(status) ;
   test_structurel_decal_1(status) ;
@@ -823,6 +831,7 @@ let test_run() : unit =
   test_structurel_final_insert(status) ;
   test_structurel_final_newstep_1(status) ;
   test_structurel_final_newstep_2(status) ;
+  close_graph() ;
   print_test_report(status) ;
 ;;
 

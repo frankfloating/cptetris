@@ -434,17 +434,11 @@ let rotate_left(pl : t_play) : unit =
 
 
 let move_at_bottom(pl : t_play) : unit =
-  let p : t_point ref = pl.cur_shape.base in
-  let p_down : t_point = {x = (!p).x - 1 ; y = (!p).y} in 
-  let shape : t_point list = pl.par.shapes.value.(!(pl.cur_shape.shape)).shape in
-  let mymat : t_color matrix = pl.mat in
-  let param : t_param = pl.par in
-  while is_free_move(p_down, shape, mymat, param)
+  let the_end : bool ref = ref true in
+  while !the_end
   do
-    move_down(pl) ;
-    p := p_down
+    the_end := move_down(pl)
   done ;
-  pl.mat.((!p).x).((!p).y) <- !(pl.cur_shape.color)
 ;;
 
 
@@ -499,22 +493,20 @@ let clear_play(pl : t_play) : unit =
   let szx : int = pl.par.mat_szx in
   let mat : t_color matrix = pl.mat in
   let graphics : t_param_graphics = pl.par.graphics in
+  clear_graph() ;
+  draw_frame(graphics.base, szx, szy, graphics.dilat) ;
   for y = 0 to szy - 1
   do
     if is_column_full(mat, y, szx)
-    then
-      (
-        decal(mat, y, szx, szy, pl.par);
-        for x = 0 to szx -1
-        do
-          fill_absolute_pt({x = x ; y = y}, graphics.base, graphics.dilat, white);
-          if mat.(x).(y) <> white
-          then drawfill_absolute_pt({x = x ; y = y}, graphics.base, graphics.dilat, mat.(x).(y))
-          else ()
-        done
-      )
-    else ()
-  done
+    then decal(mat, y, szx, szy, pl.par)
+    else () ;
+    for x = 0 to szx -1
+    do
+      if mat.(x).(y) <> white
+      then drawfill_absolute_pt({x = x ; y = y}, graphics.base, graphics.dilat, mat.(x).(y))
+      else ()
+    done
+  done 
 ;;
 
 
@@ -539,7 +531,7 @@ let final_newstep(pl : t_play) : bool =
   let param : t_param = pl.par in
   let py_move : t_point = {x = p.x ; y = p.y - 1} in
   if is_free_move(py_move, shape, mymat, param)
-  then true
+  then false
   else
     (
       let shapes : t_shape t_array = pl.par.shapes in
@@ -549,10 +541,10 @@ let final_newstep(pl : t_play) : bool =
       let new_cur : t_cur_shape = cur_shape_choice(shapes, mat_szx, mat_szy, color_arr) in
       final_insert(cur, shape, mymat) ;
       clear_play(pl) ;
-      cur.base := !(new_cur.base) ;
-      cur.shape := !(new_cur.shape) ;
-      cur.color := !(new_cur.color) ;
-      false
+      cur.base := new_cur.base ;
+      cur.shape := new_cur.shape ;
+      cur.color := new_cur.color ;
+      not(insert(cur, shape, param, mymat))
     )
 ;;
 

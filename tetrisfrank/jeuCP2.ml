@@ -531,7 +531,7 @@ let final_newstep(pl : t_play) : bool =
   let param : t_param = pl.par in
   let py_move : t_point = {x = p.x ; y = p.y - 1} in
   if is_free_move(py_move, shape, mymat, param)
-  then true
+  then false
   else
     (
       let shapes : t_shape t_array = pl.par.shapes in
@@ -544,7 +544,7 @@ let final_newstep(pl : t_play) : bool =
       cur.base := !(new_cur.base) ;
       cur.shape := !(new_cur.shape) ;
       cur.color := !(new_cur.color) ;
-      false
+      not(insert(cur, shape, param, mymat))
     )
 ;;
 
@@ -603,7 +603,6 @@ let jeuCP2() : unit =
       t := !new_t
     done
 ;;
-
 
 (*
 jeuCP2() ;;

@@ -270,7 +270,7 @@ let test_structurel_insert_1(status : t_test_status) : unit =
   let cur : t_cur_shape = cur_shape_choice(init_shapes(), 15, 28, init_color()) and shape : t_point list = (init_sh011()).shape in
   let param : t_param = init_param() and mymat : t_color matrix = mat_make(15, 28, white) in
   let test_result : bool t_test_result = test_exec(test_step, insert, (cur, shape, param, mymat)) in
-  assert_true(test_step, "dans la boucle et premier consequence", test_is_success(test_result)) ;
+  assert_true(test_step, "dans la boucle et premier consequence", test_get(test_result)) ;
   test_end(test_step)
 ;;
 (*on verifie que nous rentrons dans les deux conséquences et la première alternance de la fonction, donc dans la boucle récursive*)
@@ -781,7 +781,7 @@ let test_structurel_final_newstep_1(status : t_test_status) : unit =
   let test_step : t_test_step = test_start(status, "test_structurel_final_newstep_1") in
   let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
   let test_result : bool t_test_result = test_exec(test_step, final_newstep, pl) in
-  assert_true(test_step, "étape non terminé", test_get(test_result)) ;
+  assert_false(test_step, "étape non terminé", test_get(test_result)) ;
   test_end(test_step)
 ;;
 (*pourqoi ce test : on vérifie la conséquence*)
@@ -793,7 +793,7 @@ let test_structurel_final_newstep_2(status : t_test_status) : unit =
   let test_step : t_test_step = test_start(status, "test_structurel_final_newstep_2") in
   let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 0}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
   let test_result : bool t_test_result = test_exec(test_step, final_newstep, pl) in
-  assert_false(test_step, "étape terminé", test_get(test_result)) ;
+  assert_true(test_step, "étape terminé", test_get(test_result)) ;
   test_end(test_step)
 ;;
 (*pourqoi ce test : on vérifie l'altérnance, les fonctions appelés ont déjà été testés*)
