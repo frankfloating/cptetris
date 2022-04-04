@@ -185,7 +185,7 @@ test pour base_draw : {x = 50 ; y = 50}
           size_x : 15
           size_y : 28
           dilat : 20 ;
-résulat attendu : cadre de carrés remplies en noire de longueurs (dilat - 1) entourant zone d'affichage d'épaisseur de 2 carrés.
+résulat attendu : cadre de carrés remplies en noire de longueurs (dilat - 1) entourant zone d'affichage.
 résulat obtenu : comme attendu.
 test ok ;
 pourquoi ce test : la fonction fait appel à la fonction drawfill_absolute_pt() dans 3 boucles itératives différentes, on rentre donc dans chaques.
@@ -381,6 +381,30 @@ test ok ;
 pourquoi ce test : test fait appel à fill_pt_list() et drawfill_pt_list().
  *)
 
+(*test_structurel_move_left_1*)
+
+let test_structurel_move_left_1(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_move_left_1") in
+  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
+  test_exec(test_step, move_left, pl) ;
+  assert_equals(test_step, "forme bouge à gauche", !(pl.cur_shape.base), {x = 4 ; y = 10}) ;
+  test_end(test_step)
+;;
+(*pourquoi ce test : rentre dans alternance*)
+
+
+(*test_structurel_move_left_2*)
+
+let test_structurel_move_left_2(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_move_left_2") in
+  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 0 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
+  test_exec(test_step, move_left, pl) ;
+  assert_equals(test_step, "forme ne bouge pas à gauche", !(pl.cur_shape.base), {x = 0 ; y = 10}) ;
+  test_end(test_step)
+;;
+(*pourquoi ce test : rentre dans conséquence*)
+
+
 
 (*test_graphique_move_right*)
 
@@ -394,6 +418,30 @@ résultat obtenu : comme attendu.
 test ok ;
 pourquoi ce test : test fait appel à fill_pt_list() et drawfill_pt_list().
  *)
+
+
+(*test_structurel_move_right_1*)
+
+let test_structurel_move_right_1(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_move_right_1") in
+  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
+  test_exec(test_step, move_right, pl) ;
+  assert_equals(test_step, "forme bouge à droite", !(pl.cur_shape.base), {x = 6 ; y = 10}) ;
+  test_end(test_step)
+;;
+(*pourquoi ce test : rentre dans alternance*)
+
+
+(*test_structurel_move_right_2*)
+
+let test_structurel_move_right_2(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_move_right_2") in
+  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 14 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
+  test_exec(test_step, move_right, pl) ;
+  assert_equals(test_step, "forme ne bouge pas à droite", !(pl.cur_shape.base), {x = 14 ; y = 10}) ;
+  test_end(test_step)
+;;
+(*pourquoi ce test : rentre dans conséquence*)
 
 
 (*test_graphique_move_down*)
@@ -410,6 +458,32 @@ pourquoi ce test : test fait appel à fill_pt_list() et drawfill_pt_list().
  *)
 
 
+(*test_structurel_move_down_1*)
+
+let test_structurel_move_down_1(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_move_down_1") in
+  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
+  let test_result : bool t_test_result = test_exec(test_step, move_down, pl) in
+  assert_equals(test_step, "forme descend", !(pl.cur_shape.base), {x = 5 ; y = 9}) ;
+  assert_true(test_step, "bool true", test_get(test_result)) ;
+  test_end(test_step)
+;;
+(*pourquoi ce test : rentre dans alternance*)
+
+
+(*test_structurel_move_down_2*)
+
+let test_structurel_move_down_2(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_move_down_2") in
+  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 0}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
+  let test_result : bool t_test_result = test_exec(test_step, move_down, pl) in
+  assert_equals(test_step, "forme ne bouge pas", !(pl.cur_shape.base), {x = 5 ; y = 0}) ;
+  assert_false(test_step, "bool false", test_get(test_result)) ;
+  test_end(test_step)
+;;
+(*pourquoi ce test : rentre dans conséquence*)
+
+
 (*test_graphique_rotate_right*)
 
 (*
@@ -422,6 +496,31 @@ résultat obtenu : comme attendu.
 test ok ;
 pourquoi ce test : test fait appel à fill_pt_list() et drawfill_pt_list().
  *)
+
+(*test_structurel_rotate_right_1*)
+
+let test_structurel_rotate_right_1(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_rotate_right_1") in
+  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
+  test_exec(test_step, rotate_right, pl) ;
+  assert_equals(test_step, "forme tourne à droite", !(pl.cur_shape.base), {x = 6 ; y = 11}) ;
+  assert_equals(test_step, "forme devient shape 1", !(pl.cur_shape.shape), 1) ;
+  test_end(test_step)
+;;
+(*pourquoi ce test : rentre dans alternance*)
+
+
+(*test_structurel_rotate_right_2*)
+
+let test_structurel_rotate_right_2(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_rotate_right_2") in
+  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 15 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
+  test_exec(test_step, rotate_right, pl) ;
+  assert_equals(test_step, "forme ne tourne pas à droite", !(pl.cur_shape.base), {x = 15 ; y = 10}) ;
+  assert_equals(test_step, "forme inchangé", !(pl.cur_shape.shape), 0) ;
+  test_end(test_step)
+;;
+(*pourquoi ce test : rentre dans conséquence*)
 
 
 (*test_graphique_rotate_left*)
@@ -437,6 +536,33 @@ test ok ;
 pourquoi ce test : test fait appel à fill_pt_list() et drawfill_pt_list().
  *)
 
+
+(*test_structurel_rotate_left_1*)
+
+let test_structurel_rotate_left_1(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_rotate_left_1") in
+  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
+  test_exec(test_step, rotate_left, pl) ;
+  assert_equals(test_step, "forme tourne à gauche", !(pl.cur_shape.base), {x = 7 ; y = 11}) ;
+  assert_equals(test_step, "forme devient shape 1", !(pl.cur_shape.shape), 1) ;
+  test_end(test_step)
+;;
+(*pourquoi ce test : rentre dans alternance*)
+
+
+(*test_structurel_rotate_left_2*)
+
+let test_structurel_rotate_left_2(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_rotate_left_2") in
+  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 15 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
+  test_exec(test_step, rotate_left, pl) ;
+  assert_equals(test_step, "forme ne tourne pas à gauche", !(pl.cur_shape.base), {x = 15 ; y = 10}) ;
+  assert_equals(test_step, "forme inchangé", !(pl.cur_shape.shape), 0) ;
+  test_end(test_step)
+;;
+(*pourquoi ce test : rentre dans conséquence*)
+
+
 (*test_graphique_move_at_bottom_1*)
 
 (* 
@@ -447,25 +573,20 @@ avec : open_graph(900, 900) ;;
 résultat attendu : forme bleu atteint le bas de l'espace de travail.
 résultat obtenu : comme attendu.
 test ok ;
-pourquoi ce test : vérifier la condition !(p).y > 0 respecté.
+pourquoi ce test : vérifier que la forme repose sur bas de l'espace d'affichage
  *)
 
 
-(*test_strucurel_move_at_bottom_1*)
+(*test_strucurel_move_at_bottom*)
 
-let test_structurel_move_at_bottom_1(status : t_test_status) : unit =
-  let test_step : t_test_step = test_start(status, "test_structurel_move_at_bottom_1") in
+let test_structurel_move_at_bottom(status : t_test_status) : unit =
+  let test_step : t_test_step = test_start(status, "test_structurel_move_at_bottom") in
   let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
-  let test_result : unit t_test_result = test_exec(test_step, move_at_bottom, pl) in
-  for a = 5 to pl.par.shapes.value.(0).x_len - 1
-  do
-    if pl.mat.(a).(0) <> blue
-    then test_error(test_step)
-    else assert_equals(test_step, "forme atteint bas de l'espace de travail", pl.mat.(a).(0), blue)
-    done ;
-    test_end(test_step)
+  test_exec(test_step, move_at_bottom, pl);
+  assert_equals(test_step, "forme en bas de l'espace de travail", !(pl.cur_shape.base), {x = 5 ; y = 0}) ; 
+  test_end(test_step)
 ;;
-(*pourquoi ce test : vérifier que la matrix contient la forme immobile au bas de l'espace de travail*)
+(*pourquoi ce test : condition d'arrêt provient de move_down, on rentre dans la boucle malgré les coordonnés du point base de forme*)
 
 
 (*test_graphique_move_at_bottom_2*)
@@ -478,31 +599,8 @@ avec : open_graph(900, 900) ;;
 résultat attendu : forme bleu atteint s'arrête à la position {x = 5 ; y = 6}.
 résultat obtenu : comme attendu.
 test ok ;
-pourquoi ce test : vérifier la condition is_free_move = true respecté.
+pourquoi ce test : vérifier que la forme repose sur une autre
  *)
-
-
-(*test_strucurel_move_at_bottom_1*)
-
-let test_structurel_move_at_bottom_2(status : t_test_status) : unit =
-  let test_step : t_test_step = test_start(status, "test_structurel_move_at_bottom_2") in
-  let pl : t_play = {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} in
-  (
-  pl.cur_shape.base :=  {x = 5 ; y = 10} ;
-  pl.cur_shape.shape := 0 ;
-  pl.cur_shape.color := blue ;
-  pl.mat.(5).(5) <- yellow ;
-  ) ;
-  let test_result : unit t_test_result = test_exec(test_step, move_at_bottom, pl) in
-  for a = 5 to pl.par.shapes.value.(0).x_len - 1
-  do
-    if pl.mat.(a).(6) <> blue
-    then test_error(test_step)
-    else assert_equals(test_step, "forme atteint haut d'une autre forme", pl.mat.(a).(6), blue)
-  done ;
-  test_end(test_step)
-;;
-(*pourquoi ce test : vérifier que la matrix contient la forme immobile sur une autre*)    
 
 
 (*test_structurel_is_column_full_1*)
@@ -575,7 +673,24 @@ let test_structurel_decal_2(status : t_test_status) : unit =
 ;;
 (*pourquoi ce test : on test la fonction en ne rentrant pas dans les deux boucles*)
                                                    
+(*test_graphique_clear_play_1*)
 
+(*
+test pour pl : {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} ;
+avec : open_graph(900, 900) ;;
+       draw_frame({x = 50 ; y = 50}, 15, 28, 20) ;;
+       for a = 0 to 14
+       do
+        pl.mat.(a).(1) <- blue ;
+        pl.mat.(a).(3) <- blue ;
+       done ;
+résultat attendu : ligne pleine effacé.
+résultat obtenu : comme attendu.
+test ok ;
+pourquoi ce test : vérifier que lignes pleines disparaient et remplacées par ligne du dessus
+ *)
+
+ *)
 (*test_structurel_clear_play_1*)
 
 let test_structurel_clear_play_1(status : t_test_status) : unit =
@@ -594,8 +709,27 @@ let test_structurel_clear_play_1(status : t_test_status) : unit =
   done ;
   test_end(test_step)
 ;;
-(*pourquoi ce test : on test la fonction en rentrant dans la conséquence*)
+(*pourquoi ce test : on test la fonction en rentrant dans la première conséquence*)
 
+
+(*test_graphique_clear_play_2*)
+
+(*
+test pour pl : {par = init_param() ; cur_shape = {base = ref({x = 5 ; y = 10}) ; shape = ref(0) ; color = ref(blue)} ; mat = mat_make(15, 28, white)} ;
+avec : open_graph(900, 900) ;;
+       draw_frame({x = 50 ; y = 50}, 15, 28, 20) ;;
+       for a = 0 to 14
+       do
+        pl.mat.(a).(1) <- blue ;
+        pl.mat.(a).(3) <- blue ;
+       done ;
+       pl.mat.(0).(1) <- white ;
+       pl.mat.(0).(3) <- white ;
+résultat attendu : lignes non effacées.
+résultat obtenu : comme attendu.
+test ok ;
+pourquoi ce test : vérifier que lignes non pleines inchangés
+ *)
 
 (*test_structurel_clear_play_2*)
 
@@ -619,7 +753,7 @@ let test_structurel_clear_play_2(status : t_test_status) : unit =
   done ;
   test_end(test_step)
 ;;
-(*pourquoi ce test : on test la fonction en rentrant dans l'altérnance*)
+(*pourquoi ce test : on test la fonction en rentrant dans la première l'altérnance*)
 
 
 (*test_structurel_final_insert*)
@@ -667,6 +801,7 @@ let test_structurel_final_newstep_2(status : t_test_status) : unit =
 
 let test_run() : unit =
   let status : t_test_status = create_test_status() in
+  open_graph(100, 100) ;
   test_structurel_color_choice(status) ;
   test_structurel_cur_shape_choice(status) ;
   test_structurel_insert_1(status) ;
@@ -676,8 +811,17 @@ let test_run() : unit =
   test_structurel_valid_matrix_point_2(status) ;
   test_structurel_is_free_move_1(status) ;
   test_structurel_is_free_move_2(status) ;
-  test_structurel_move_at_bottom_1(status) ;
-  test_structurel_move_at_bottom_2(status) ;
+  test_structurel_move_left_1(status) ;
+  test_structurel_move_left_2(status) ;
+  test_structurel_move_right_1(status) ;
+  test_structurel_move_right_2(status) ;
+  test_structurel_move_down_1(status) ;
+  test_structurel_move_down_2(status) ;
+  test_structurel_rotate_right_1(status) ;
+  test_structurel_rotate_right_2(status) ;
+  test_structurel_rotate_left_1(status) ;
+  test_structurel_rotate_left_2(status) ;
+  test_structurel_move_at_bottom(status) ;
   test_structurel_is_column_full_1(status) ;
   test_structurel_is_column_full_2(status) ;
   test_structurel_decal_1(status) ;
@@ -687,6 +831,7 @@ let test_run() : unit =
   test_structurel_final_insert(status) ;
   test_structurel_final_newstep_1(status) ;
   test_structurel_final_newstep_2(status) ;
+  close_graph() ;
   print_test_report(status) ;
 ;;
 
